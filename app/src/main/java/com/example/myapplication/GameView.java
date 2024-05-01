@@ -11,6 +11,7 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.media.MediaPlayer;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -127,38 +128,36 @@ import com.example.myapplication.graphics.Flower5Tile;
 import com.example.myapplication.graphics.SelectedFlower5Tile;
 
 
-// gameView manages all objects in the game and is responsible for updating all states + render all objs to screen
+// gameView manages all objects in the game and is responsible for updating all states + render all objects to screen
 
 public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     private final Tilemap tilemap;
     private final GreenhouseTilemap greenhouseTilemap;
     public SurfaceHolder surfaceHolder;
     public GameLoop gameLoop;
-    //public Paint textpaint = new Paint();
     public String buttonPressed = "none";
     private MediaPlayer mediaPlayer;
 
-    private GameDisplay gameDisplay;
+    private final GameDisplay gameDisplay;
 
-    private WateringcanObj wateringcan;
+    private final WateringcanObj wateringcan;
 
-    private ShovelObj shovel;
+    private final ShovelObj shovel;
 
-    private SpraylObj spray;
-    private SeedObj seed;
-    private PopupObj popup;
+    private final SpraylObj spray;
+    private final SeedObj seed;
+    private final PopupObj popup;
 
-    private HelpObj help;
-    private IconsObj icons;
-    private AudioOnObj audioOn;
-    private AudioOffObj audioOff;
-    private GreenhousePopupObj greenhouseFlowers;
+    private final HelpObj help;
+    private final IconsObj icons;
+    private final AudioOnObj audioOn;
+    private final AudioOffObj audioOff;
+    private final GreenhousePopupObj greenhouseFlowers;
 
-    private GreenhouseButtonObj greenhouse;
-    private GardenButtonObj garden;
+    private final GreenhouseButtonObj greenhouse;
+    private final GardenButtonObj garden;
     private boolean showSeeds = false;
     private boolean showHelp = false;
-    private boolean seedChosen;
     private boolean tileSelected = false;
     private boolean greenhouseScreen = false;
     private boolean gardenScreen = true;
@@ -178,7 +177,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
     private Tile pointerTile;
     private Tile ghPointerTile;
-    private Tile selectedTile;
 
     private String hoverText = "";
 
@@ -186,8 +184,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
     private float xPos;
     private float yPos;
-    private Context context;
+    private final Context context;
 
+    private static final String LOG_TAG = "MEADOW_TAG";
 
     public GameView(Context context) {
         super(context);
@@ -205,7 +204,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
         this.context = context;
 
-        //INITIALIZE SPRITESHEET
+        //INITIALIZE SPRITE SHEET
         SpriteSheet spriteSheet = new SpriteSheet(context);
 
         //INITIALIZE game display and center around player
@@ -249,91 +248,59 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
     }
 
-/*
-    private boolean checkIfTileMapContainsSelected(float xPos, float yPos){
-        int row = 0;
-        int column = 0;
-
-        boolean result = false;
-
-        while (row < 10) {
-            Rect rect = tilemap.getRectByIndex(row, column);
-            //finding the position of the tiles
-            float exactCentreX = rect.exactCenterX();
-            float exactCentreY = rect.exactCenterY();
-
-            //seeing if the position of mouse matches with a tile
-            if ((xPos > exactCentreX - 46 && xPos < exactCentreX + 46) && (yPos > exactCentreY - 46 && yPos < exactCentreY + 46)) {
-                System.out.println("Fuck yeah!");
-                //find which row and column this tile is
-                Tile selectedTile = tilemap.tilemap[row][column];
-
-                if (selectedTile instanceof SelectedDirtTile) {
-                    result = true;
-
-                }
-                break;
-            }
-        }
-        return result;
-    }
-
- */
-
-
     //AUDIO
     public void playSelectBlock(){
         if (audio) {
             MediaPlayer mediaPlayer = MediaPlayer.create(this.getContext(), R.raw.select_block);
             mediaPlayer.start();
         }
-    };
+    }
 
     public void playSelectSeed(){
         if (audio) {
             MediaPlayer mediaPlayer = MediaPlayer.create(this.getContext(), R.raw.select_seed);
             mediaPlayer.start();
         }
-    };
+    }
 
     public void playSelectTool(){
         if (audio) {
             MediaPlayer mediaPlayer = MediaPlayer.create(this.getContext(), R.raw.select);
             mediaPlayer.start();
         }
-    };
+    }
 
     public void playSpray(){
         if (audio) {
             MediaPlayer mediaPlayer = MediaPlayer.create(this.getContext(), R.raw.spray);
             mediaPlayer.start();
         }
-    };
+    }
     public void playWater(){
         if (audio) {
             MediaPlayer mediaPlayer = MediaPlayer.create(this.getContext(), R.raw.water);
             mediaPlayer.start();
         }
-    };
+    }
 
     public void playGrow(){
         if (audio) {
             MediaPlayer mediaPlayer = MediaPlayer.create(this.getContext(), R.raw.grow);
             mediaPlayer.start();
         }
-    };
+    }
 
     public void playSwitchScreen(){
         if (audio) {
             MediaPlayer mediaPlayer = MediaPlayer.create(this.getContext(), R.raw.changescreen);
             mediaPlayer.start();
         }
-    };
+    }
 
     //handles motion / touch event
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        System.out.println("onTouchEvent");
+        Log.i(LOG_TAG, "onTouchEvent");
 
         //position of mouse
         xPos = event.getX();
@@ -356,21 +323,18 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
             //seeing if the position of mouse matches with a tile
             if ((xPos > exactCentreX - 46 && xPos < exactCentreX + 46) && (yPos > exactCentreY - 46 && yPos < exactCentreY + 46)) {
                 pointerTile = tilemap.tilemap[row][column];
-                System.out.println(pointerTile);
+                Log.d(LOG_TAG, "Tile type is: " + pointerTile);
                 //find which row and column this tile is
                 ghPointerTile = greenhouseTilemap.tilemap[row][column];
-                System.out.println(ghPointerTile);
 
                 if (event.getActionMasked() == MotionEvent.ACTION_DOWN) {
                     if (gardenScreen){
                     //selecting dirt tile
                         if (pointerTile instanceof DirtTile && !tileSelected) {
-                            System.out.println(pointerTile);
                             playSelectBlock();
                             //tilemap.map.getLayout()[row][column] = 1;
                             // Redraw the map bitmap with the updated tile
                             tilemap.updateTile(row, column, 24);
-                            System.out.println(tileSelected);
                             tileSelected = true;
 
                             //text popup
@@ -378,7 +342,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
                             // unselecting dirt tile
                         } else if (pointerTile instanceof SelectedDirtTile && tileSelected) {
-                            System.out.println(pointerTile);
                             playSelectBlock();
                             //tilemap.map.getLayout()[row][column] = 1;
                             // Redraw the map bitmap with the updated tile
@@ -680,7 +643,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                             greenhouseTilemap.updateTile(row, column, 70);
                             tileSelected = true;
                             //text popup
-                            hoverText = "empty plantpot";
+                            hoverText = "empty plant pot";
                         }
                         //unselecting
                         else if (ghPointerTile instanceof GhSelectedPotTile && tileSelected) {
@@ -688,7 +651,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                             greenhouseTilemap.updateTile(row, column, 49);
                             tileSelected = false;
                             //text popup
-                            hoverText = "empty plantpot";
+                            hoverText = "empty plant pot";
                         } else if (ghPointerTile instanceof GhFlower1Grow1Tile && !tileSelected) {
                             playSelectBlock();
                             greenhouseTilemap.updateTile(row, column, 71);
@@ -875,7 +838,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                             hoverText = "growing flower";
                         } else if (ghPointerTile instanceof GhFlower4Grow3Tile && !tileSelected) {
                             playSelectBlock();
-                            System.out.println("pot tile clicked");
                             greenhouseTilemap.updateTile(row, column, 84);
                             tileSelected = true;
                             //text popup
@@ -904,7 +866,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                             hoverText = "growing flower";
                         } else if (ghPointerTile instanceof GhFlower1Tile && !tileSelected) {
                             playSelectBlock();
-                            System.out.println("pot tile clicked");
                             greenhouseTilemap.updateTile(row, column, 86);
                             tileSelected = true;//text popup
                             hoverText = "growing flower";
@@ -1085,10 +1046,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                     hoverText = "watering can";
                 }
 
-                if (showSeeds == false) {
+                if (!showSeeds) {
                     if (seed.isTouched(event.getX(), event.getY()) && !(seed.getActionDown())) {
                         seed.setActionDown(true);
-                        System.out.println("show seed!");
+                        Log.i(LOG_TAG, "Show seed");
                         playSelectTool();
                         showSeeds = true;
                         //text popup
@@ -1097,7 +1058,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                 } else { //if (showSeeds){
                     if (seed.isTouched(event.getX(), event.getY()) && !(seed.getActionDown())) {
                         seed.setActionDown(true);
-                        System.out.println("hide seed!");
+                        Log.i(LOG_TAG, "Hide seed");
                         playSelectTool();
                         showSeeds = false; //text popup
                         hoverText = "seeds";
@@ -1105,17 +1066,17 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                     }
                 }
 
-                if (showHelp == false) {
+                if (!showHelp) {
                     if (help.isTouched(event.getX(), event.getY()) && !(help.getActionDown())) {
                         help.setActionDown(true);
-                        System.out.println("show help!");
+                        Log.i(LOG_TAG, "Show help");
                         playSelectTool();
                         showHelp = true;
                     }
                 } else { //if (showHelp){
                     if (help.isTouched(event.getX(), event.getY()) && !(help.getActionDown())) {
                         help.setActionDown(true);
-                        System.out.println("hide seed!");
+                        Log.i(LOG_TAG, "Hide help");
                         playSelectTool();
                         showHelp = false;
                     }
@@ -1124,33 +1085,31 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                 if (audio) {
                     if (audioOn.isTouched(event.getX(), event.getY()) && !(audioOn.getActionDown())) {
                         audioOn.setActionDown(true);
-                        System.out.println("audio off!");
+                        Log.i(LOG_TAG, "Audio off");
                         audio = false;
                     }
                 } else { //if (showHelp){
                     if (audioOff.isTouched(event.getX(), event.getY()) && !(audioOff.getActionDown())) {
                         audioOff.setActionDown(true);
-                        System.out.println("audio on!");
+                        Log.i(LOG_TAG, "Audio on");
                         audio = true;
                     }
                 }
 
                 if (gardenScreen) {
-                    System.out.println("gardenScreen is true");
-
+                    Log.i(LOG_TAG, "Garden screen is true");
                     if (greenhouse.isTouched(event.getX(), event.getY()) && !(greenhouse.getActionDown())) {
                         greenhouse.setActionDown(true);
                         playSwitchScreen();
                         greenhouseScreen = true;
                         gardenScreen = false;
-                        //System.out.println("show greenhouse screen " + greenhouseScreen);
                         //text popup
                         hoverText = "greenhouse";
                     }
                 }
                 //if (greenhouseScreen) {
                 else {
-                    System.out.println("greenhouseScreen is true");
+                    Log.i(LOG_TAG, "Greenhouse screen is true");
                     if (garden.isTouched(event.getX(), event.getY()) && !(garden.getActionDown())) {
                         garden.setActionDown(true);
                         playSwitchScreen();
@@ -1158,7 +1117,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                         greenhouseScreen = false;
                         //text popup
                         hoverText = "garden";
-                        //System.out.println("show seed screen " + gardenScreen);
                     }
                 }
 
@@ -1248,8 +1206,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                 && getX < popup.flower1X + popup.flowerWidth
                 && getY > popup.flower1Y
                 && getY < popup.flower1Y + popup.flowerHeight) {
-            System.out.println("flower1 pressed");
-            seedChosen = true;
+            Log.i(LOG_TAG, "Flower1 pressed");
             flower1Selected = true;
             //audio
             playSelectSeed();
@@ -1259,8 +1216,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                 && getX < popup.flower2X + popup.flowerWidth
                 && getY > popup.flower2Y
                 && getY < popup.flower2Y + popup.flowerHeight) {
-            System.out.println("flower2 pressed");
-            seedChosen = true;
+            Log.i(LOG_TAG, "Flower2 pressed");
             flower2Selected = true;
             //audio
             playSelectSeed();
@@ -1269,8 +1225,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                 && getX < popup.flower3X + popup.flowerWidth
                 && getY > popup.flower3Y
                 && getY < popup.flower3Y + popup.flowerHeight) {
-            System.out.println("flower3 pressed");
-            seedChosen = true;
+            Log.i(LOG_TAG, "Flower3 pressed");
             flower3Selected = true;
             //audio
             playSelectSeed();
@@ -1279,8 +1234,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                 && getX < popup.flower4X + popup.flowerWidth
                 && getY > popup.flower4Y
                 && getY < popup.flower4Y + popup.flowerHeight) {
-            System.out.println("flower4 pressed");
-            seedChosen = true;
+            Log.i(LOG_TAG, "Flower4 pressed");
             flower4Selected = true;
             //audio
             playSelectSeed();
@@ -1289,8 +1243,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                 && getX < popup.flower5X + popup.flowerWidth
                 && getY > popup.flower5Y
                 && getY < popup.flower5Y + popup.flowerHeight) {
-            System.out.println("flower5 pressed");
-            seedChosen = true;
+            Log.i(LOG_TAG, "Flower5 pressed");
             flower5Selected = true;
             //audio
             playSelectSeed();
@@ -1302,8 +1255,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                 && getX < greenhouseFlowers.flower1X + greenhouseFlowers.flowerWidth
                 && getY > greenhouseFlowers.flower1Y
                 && getY < greenhouseFlowers.flower1Y + greenhouseFlowers.flowerHeight) {
-            System.out.println(" gh flower1 pressed");
-            seedChosen = true;
+            Log.i(LOG_TAG, "GH Flower1 pressed");
             ghFlower1Selected = true;
             //audio
             playSelectSeed();
@@ -1313,8 +1265,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                 && getX < greenhouseFlowers.flower2X + greenhouseFlowers.flowerWidth
                 && getY > greenhouseFlowers.flower2Y
                 && getY < greenhouseFlowers.flower2Y + greenhouseFlowers.flowerHeight) {
-            System.out.println("flower2 pressed");
-            seedChosen = true;
+            Log.i(LOG_TAG, "GH Flower2 pressed");
             ghFlower2Selected = true;
             //audio
             playSelectSeed();
@@ -1323,8 +1274,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                 && getX < greenhouseFlowers.flower3X + greenhouseFlowers.flowerWidth
                 && getY > greenhouseFlowers.flower3Y
                 && getY < greenhouseFlowers.flower3Y + greenhouseFlowers.flowerHeight) {
-            System.out.println("flower3 pressed");
-            seedChosen = true;
+            Log.i(LOG_TAG, "GH Flower3 pressed");
             ghFlower3Selected = true;
             //audio
             playSelectSeed();
@@ -1333,8 +1283,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                 && getX < greenhouseFlowers.flower4X + greenhouseFlowers.flowerWidth
                 && getY > greenhouseFlowers.flower4Y
                 && getY < greenhouseFlowers.flower4Y + greenhouseFlowers.flowerHeight) {
-            System.out.println("flower4 pressed");
-            seedChosen = true;
+            Log.i(LOG_TAG, "GH Flower4 pressed");
             ghFlower4Selected = true;
             //audio
             playSelectSeed();
@@ -1343,8 +1292,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                 && getX < greenhouseFlowers.flower5X + greenhouseFlowers.flowerWidth
                 && getY > greenhouseFlowers.flower5Y
                 && getY < greenhouseFlowers.flower5Y + greenhouseFlowers.flowerHeight) {
-            System.out.println("flower5 pressed");
-            seedChosen = true;
+            Log.i(LOG_TAG, "GH Flower5 pressed");
             ghFlower5Selected = true;
             //audio
             playSelectSeed();
@@ -1635,13 +1583,13 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         } else if (selectedTile instanceof GhSelectedFlower2Grow1Tile) {
             ghNextWaterTile = 56;
             //if flower3grow1 is selected and watered, change to flower3grow2
-        } else if (selectedTile instanceof GhSelectedFlower2Grow1Tile) {
+        } else if (selectedTile instanceof GhSelectedFlower3Grow1Tile) {
             ghNextWaterTile = 57;
             //if flower4grow1 is selected and watered, change to flower4grow2
-        } else if (selectedTile instanceof GhSelectedFlower3Grow1Tile) {
+        } else if (selectedTile instanceof GhSelectedFlower4Grow1Tile) {
             ghNextWaterTile = 58;
             //if flower5grow1 is selected and watered, change to flower5grow2
-        } else if (selectedTile instanceof GhSelectedFlower4Grow1Tile) {
+        } else if (selectedTile instanceof GhSelectedFlower5Grow1Tile) {
             ghNextWaterTile = 59;
 
 
@@ -1742,16 +1690,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         }
 
         showHoverText(canvas);
-    }
-
-    public int getDisplayWidth(){
-        int width = getContext().getResources().getDisplayMetrics().widthPixels;
-        return width;
-    }
-
-    public int getDisplayHeight(){
-        int height = getContext().getResources().getDisplayMetrics().heightPixels;
-        return height;
     }
 
     @Override

@@ -2,7 +2,7 @@
 <project version="4">
   <component name="deploymentTargetDropDown">
     <value>
-      <entry key="MainActivity">
+      <entry key="ExampleInstrumentedTest">
         <State>
           <targetSelectedWithDropDown>
             <Target>
@@ -10,12 +10,12 @@
               <deviceKey>
                 <Key>
                   <type value="VIRTUAL_DEVICE_PATH" />
-                  <value value="C:\Users\poppy\.android\avd\Pixel_7_Landscape.avd" />
+                  <value value="C:\Users\poppy\.android\avd\Pixel_5_API_33.avd" />
                 </Key>
               </deviceKey>
             </Target>
           </targetSelectedWithDropDown>
-          <timeTargetWasSelectedWithDropDown value="2024-01-19T17:00:13.258013700Z" />
+          <timeTargetWasSelectedWithDropDown value="2024-04-28T16:41:26.473625900Z" />
         </State>
       </entry>
       <entry key="app">
