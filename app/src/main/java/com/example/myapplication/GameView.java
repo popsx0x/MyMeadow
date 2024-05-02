@@ -963,7 +963,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                         spray.setPosition(event.getX(), event.getY());
 
 
-                        //calls 'getWateringNextTile' checks which tile is next
+                        //calls 'getSprayNextTile' checks which tile is next
                         int nextTile = getSprayNextTile(pointerTile);
                         if (nextTile != 0) {
                             tilemap.updateTile(row, column, nextTile);
@@ -996,7 +996,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                         }
                         pointerTile = null;
 
-                        //calls 'geGghWateringNextTile' checks which tile is next
+                        //calls 'getGgWateringNextTile' checks which tile is next
                         int ghNextTile = getGhWaterNextTile(ghPointerTile);
                         if (ghNextTile != 0) {
                             greenhouseTilemap.updateTile(row, column, ghNextTile);
